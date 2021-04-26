@@ -51,6 +51,17 @@
         * Kiểm thử
         * Triển khai
         * Bảo trì
+### 4. **Dự đoán giá nông sản theo tháng trong năm**
+* ***Input***: thời gian trong năm theo tháng, độ thuận lợi của thời tiết theo thang 10, sức mua theo thang 10, nhu cầu xuất nhập khẩu, sản lượng thu được theo Kg (Kiểu số nguyên)
+* ***output***:Giá bán của nông sản (Kiểu số thực)
+* ***Thu thập data***: 
+   * tra cứu trên Google
+   * các trang báo về nông nghiệp
+   * Trang web của bộ công thương: www.thongke.idea.gov.vn/
+   * Tổng cuc thống kê Việt Nam: www.gso.gov.vn
+* ***Xử lý data***:
+   * Làm đầy các phần dữ liệu trống(None)
+   * Định dạng thành 1 file .csv
 
 
 
