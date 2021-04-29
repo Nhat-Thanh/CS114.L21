@@ -32,14 +32,14 @@
 * ***Xử lý data***:
     * Tính tỷ suất sinh và tỷ suất tử
     * Thống kế được phần trăm dân số kết hôn
-    * Tổng hợp các dữ liệu thành file SCV.
+    * Tổng hợp các dữ liệu thành file CSV.
 
 ### 3. **Dự đoán tiền lương ngành Công nghệ Thông tin dựa vào bằng cấp, số năm kinh nghiệm, số dự án tham gia**
 * ***Input***: Bằng cấp (kiểu chuỗi), số năm kinh nghiệm (kiểu số nguyên), số dự án tham gia (kiểu số nguyên) của các nhân sự trong ngành Công nghệ Thông tin
 * ***output***: Lương (kiểu số thực)
 * ***Thu nhập data***:
     * Khảo sát các nhân sự trong ngành CNTT
-    * Liên hệ với bộ phận nhân sự trong Công ty để xin.
+    * Liên hệ với bộ phận nhân sự của các công ty công nghệ như Gameloft, Dek, KMS, Fujinet, VNG, FPT, vv.
 * ***Xử lý data***:
     * Gôm nhóm các bằng cấp thành các loại phổ biến.
     * Phân loại giữa bằng cấp ở Việt Nam và nước ngoài.
@@ -55,8 +55,8 @@
 * ***Input***: thời gian trong năm theo tháng, độ thuận lợi của thời tiết theo thang 10, sức mua theo thang 10, nhu cầu xuất nhập khẩu, sản lượng thu được theo Kg (Kiểu số nguyên)
 * ***output***:Giá bán của nông sản (Kiểu số thực)
 * ***Thu thập data***: 
-   * tra cứu trên Google
-   * các trang báo về nông nghiệp
+   * Tra cứu trên Google
+   * Các trang báo về nông nghiệp
    * Trang web của bộ công thương: www.thongke.idea.gov.vn/
    * Tổng cuc thống kê Việt Nam: www.gso.gov.vn
 * ***Xử lý data***:
