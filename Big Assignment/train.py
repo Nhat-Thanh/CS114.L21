@@ -24,20 +24,23 @@ INIT_LR = 1e-4
 EPOCHS = 20
 BS = 32
 '''
-# chỉnh thử
+# learning rate
 INIT_LR = 1e-4
-# xuonsg 20 cũng được
-EPOCHS = 25
-# batch siz: thử nhé
+# số lần lướt qua epoch
+EPOCHS = 20
+# batch size = 20
 BS = 32
 
 # grab the list of images in our dataset directory, then initialize
 # the list of data (i.e., images) and class images
+'''
+Các thuộc tính trong thư mục dataset.
+Đây cũng là các nhãn mà mô hình sẽ dự đoán.
+'''
 CATEGORY = [ 'incorrect_mask', 'correct_mask', 'without_mask' ]
 
-DIRECTORY = 'dataset/'
 '''
-đầu ra là onehot
+Đầu ra của mô hình một vector dạng onehot, với 3 kết quả như sau:
 [1, 0, 0]: correct
 [0, 1, 0]: incorrect
 [0, 0, 1]: without
@@ -46,26 +49,36 @@ DIRECTORY = 'dataset/'
 # this is a np.array() that each element is a
 train_images = []
 train_labels = []
-test_images = []    # validation
-test_labels = []    # validation
+validation_images = []    # validation
+validation_labels = []    # validation
+test_images = []
+test_labels = []
 # thếm 2 mảng test
 # thiếu test
 
 for category in CATEGORY:
-    path = os.path.join(DIRECTORY, category)
-    
+    # tạo đường dẫn: dataset/"category"
+    # với category là 1 trong 3 phần tử của mảng CATEGORY (dòng 40)
+    path = os.path.join("dataset", category)
+    # lấy danh sách các file trong đường dẫn path
     listdir = os.listdir(path)
-    
+    # xáo trộn danh sách vừa lấy được ở trên.
     random.shuffle(listdir)
-
-    _70_percent = int(len(listdir) * 0.7)
+    # 70 phần trăm số lượng ảnh trong thư mục path
+    _70_percent_train = int(len(listdir) * 0.7)
+    # 15 phần trăm validation, còn lại sẽ là test
+    _15_percent_validation = int(len(listdir) - _70_percent_train) // 2
     
-    print(f"{category}: {len(listdir)}")
-    print(f"train size: {_70_percent}")
-    print(f"test_size: {len(listdir) - _70_percent}\n")
+    # in các thông tin về số lượng ảnh trong thư mục và số lượng ảnh sử dụng cho train, validation, và test
+    print(f"{category} size: {len(listdir)}")
+    print(f"train size: {_70_percent_train}")
+    print(f"validation size: {_15_percent_validation}")
+    print(f"test size: {len(listdir) - _70_percent_train - _15_percent_validation}\n")
     
     # training data
-    for img in listdir[0:_70_percent]:
+    first = 0
+    last = _70_percent_train
+    for img in listdir[first : last]:
         img_path = os.path.join(path, img)
         image = load_img(img_path, target_size=(224, 224))
         image = img_to_array(image)
@@ -73,8 +86,20 @@ for category in CATEGORY:
         train_images.append(image)
         train_labels.append(category)
     
-    # testing data
-    for img in listdir[_70_percent:-1]:
+    # validation data
+    first = last
+    last = first + _15_percent_validation
+    for img in listdir[first : last]:
+        img_path = os.path.join(path, img)
+        image = load_img(img_path, target_size=(224, 224))
+        image = img_to_array(image)
+        preprocess_input(image)
+        validation_images.append(image)
+        validation_labels.append(category)
+
+    # test data
+    first = last
+    for img in listdir[first : -1]:
         img_path = os.path.join(path, img)
         image = load_img(img_path, target_size=(224, 224))
         image = img_to_array(image)
@@ -84,23 +109,20 @@ for category in CATEGORY:
 
 train_images = np.array(train_images, dtype='float32')
 train_labels = np.array(train_labels)
+validation_images = np.array(validation_images, dtype='float32')
+validation_labels = np.array(validation_labels)
 test_images = np.array(test_images, dtype='float32')
 test_labels = np.array(test_labels)
-
-'''
-print(train_images.shape)
-print(train_labels[0])
-print(test_images.shape)
-print(test_labels[0])
-'''
 
 # perform one-hot encoding on the labels
 lb = LabelBinarizer()
 train_labels = lb.fit_transform(train_labels)
+validation_labels = lb.fit_transform(validation_labels)
 test_labels = lb.fit_transform(test_labels)
 
 # construct the training image generator for data augmentation
 # tìm hiêu các đối số này
+'''
 aug = ImageDataGenerator(
 	rotation_range=20,
 	zoom_range=0.15,
@@ -109,13 +131,21 @@ aug = ImageDataGenerator(
 	shear_range=0.15,
 	horizontal_flip=True,
 	fill_mode="nearest")
+'''
+aug = ImageDataGenerator(
+	rotation_range=40,
+	zoom_range=0.15,
+	width_shift_range=0.2,
+	height_shift_range=0.2,
+	shear_range=0.15,
+	horizontal_flip=True,
+	fill_mode="nearest")
 
-# load a MobileNetV2 model with fully connected layer left off
-# fully connected layer will be customize later
+# sử dụng MobileNetV2 với fc bị loại bỏ
 baseModel = MobileNetV2(weights="imagenet", include_top=False,
 	input_tensor=Input(shape=(224, 224, 3)))
 
-# construct a fully connected layer which will be put to head of model
+# tùy biến fc để gắn vào basemodel
 headModel = baseModel.output
 headModel = AveragePooling2D(pool_size=(7, 7))(headModel)
 headModel = Flatten(name="flatten")(headModel)
@@ -124,8 +154,7 @@ headModel = Dense(128, activation="relu")(headModel)
 headModel = Dropout(0.5)(headModel)
 headModel = Dense(3, activation="softmax")(headModel)
 
-# place the head FC model on top of the base model (this will become
-# the actual model we will train)
+# gắn headmodel vào basemodel để tạo ra mô hình hoàn chỉnh
 model = Model(inputs=baseModel.input, outputs=headModel)
 
 # loop over all layers in the base model and freeze them so they will
@@ -133,45 +162,38 @@ model = Model(inputs=baseModel.input, outputs=headModel)
 for layer in baseModel.layers:
 	layer.trainable = False
 
-# compile our model
+# biên dịch model
 print("[INFO] compiling model...")
 opt = Adam(learning_rate=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss="categorical_crossentropy", optimizer=opt,
 	metrics=["accuracy"])
 
-'''
-print(train_images.shape)
-print(train_labels[0])
-print(test_images.shape)
-print(test_labels[0])
-'''
-
-# train the head of the network
+# huấn luyện fc
 print("[INFO] training head...")
 H = model.fit(
 	aug.flow(train_images, train_labels, batch_size=BS),
 	steps_per_epoch=len(train_images) // BS,
-	validation_data=(test_images, test_labels),
-	validation_steps=len(test_images) // BS,
+	validation_data=(validation_images, validation_labels),
+	validation_steps=len(validation_images) // BS,
 	epochs=EPOCHS)
 
 # make predictions on the testing set
 print("[INFO] evaluating network...")
 predIdxs = model.predict(test_images, batch_size=BS)
 
-# for each image in the testing set we need to find the index of the
-# label with corresponding largest predicted probability
+# mội ảnh sẽ được mô hình đoán ra 3 xác suất tương ứng với 3 nhãn
+# tạo ra một mảng mà mỗi phần tử là index của nhãn có xác suất cao nhất.
 predIdxs = np.argmax(predIdxs, axis=1)
 
-# show a nicely formatted classification report
+# in ra thống kê kết quả của tập test
 print(classification_report(test_labels.argmax(axis=1), predIdxs,
 	target_names=lb.classes_))
 
-# serialize the model to disk
+# lưu model vào file và lưu trên đĩa cứng
 print("[INFO] saving mask detector model...")
 model.save("mask_detector.model", save_format="h5")
 
-# plot the training loss and accuracy
+# vẽ biểu đồ loss và accuracy của của quá trình train.
 N = EPOCHS
 plt.style.use("ggplot")
 plt.figure()
