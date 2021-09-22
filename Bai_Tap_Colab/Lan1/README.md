@@ -1,1 +1,0 @@
-***Recognizing hand-written digits***
