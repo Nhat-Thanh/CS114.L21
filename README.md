@@ -1,4 +1,4 @@
-# CS114.L21 - Machine Learning class
+# CS114.L21 - Machine Learning
 # Member:
 | STT | Họ và Tên | MSSV | Email | Git |
 |:-----:|:-----------:|:------:|:-------:|:-----:|
