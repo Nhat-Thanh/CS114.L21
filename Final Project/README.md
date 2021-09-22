@@ -1,2 +1,2 @@
-# ĐỒ ÁN CUỐI KỲ
-## ĐỀ TÀI: PHÁT HIỆN ĐỐI TƯỢNG KHÔNG ĐEO KHẨU TRANG VÀ ĐEO KHẨU TRANG SAI CÁCH THÔNG QUA CAMERA GIÁM SÁT
+# Đô án cuối kỳ
+## Đề tại: Phát hiện đối tượng không đeo khẩu trang và đeo khẩu trang sai cách thông qua Camera giám sát.
